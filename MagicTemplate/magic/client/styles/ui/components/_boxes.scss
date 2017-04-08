@@ -1,0 +1,139 @@
+
+$icon_box_size:     110px;
+
+.icon-box {
+    .icon-container {
+        border: 1px solid rgba(0,0,0,.05);
+        box-shadow: 0 0 0 7px rgba(0,0,0,.01);
+        border-radius: 50%;
+        width: $icon_box_size;
+        height: $icon_box_size;
+        text-align: center;
+        font-size: 50px;
+        line-height: $icon_box_size;
+        color: $brand-primary;
+    }
+
+    h4 {
+        font-weight: bold;
+    }
+
+    .desc-container {
+        @media (min-width: $screen-sm-min) {
+            max-width: 250px;
+        }
+    }
+}
+
+
+.icon-box-alt {
+    width: 160px;
+    margin: auto;
+    text-align: center;
+    .icon-container {
+        font-size: 52px;
+        line-height: 1;
+        color: #8c97a0;
+    }
+
+    h4 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .desc {
+        font-style: italic;
+        color: #8c97a0;
+    }
+}
+
+.icon-box-vertical {
+    padding: 15px 0;
+    text-align: center;
+    .icon-container {
+        margin: 0 auto 15px;
+    }
+
+    .desc-container {
+        margin: auto;
+    }
+}
+
+.icon-box-horizontal {
+    position: relative;
+    min-height: ($icon_box_size + 20px);
+    padding: 10px 10px 10px 145px;
+    .icon-container {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+    }
+}
+
+
+// 
+
+.photo-box {
+    text-align: center;
+    img {
+        max-width: 100%;
+    }
+
+    h4 {
+        font-weight: bold;
+    }
+
+    .photo-container {
+        border: 8px solid $bright;
+    }
+}
+
+.media-box {
+    img {
+        max-width: 100%;
+    }
+    a {
+        color: $text-color;
+    }
+    h5 {
+        margin: 0;
+        line-height: 20px;
+        font-weight: normal;
+    }
+    .media-box-photo {
+        border-radius: $border-radius-base;
+    }
+
+    .media-box-body {
+        padding: 15px;
+        .profile-img {
+            position: relative;
+            z-index: 1;
+            margin-top: -65px;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            padding: 5px; 
+            background-color: #fff;
+            img {
+                width: 90px;
+                height: 90px;
+                border-radius: 50%;
+            }
+
+            &.profile-img-sm {
+                margin-top: -40px;
+                width: 60px;
+                height: 60px;
+                padding: 2px; 
+                img {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 50%;
+                }               
+            }
+        }
+
+    }
+}

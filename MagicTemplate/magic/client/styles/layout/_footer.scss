@@ -1,0 +1,28 @@
+
+// When Nav is vertical
+.app-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-left: 220px; // Nav width
+    font-size: $font-size-small;
+    padding: $padding-large-horizontal;
+    background-color: darken($main_container_bg, 2%);
+    border-top: 1px solid darken($main_container_bg, 5%);
+}
+
+
+// When Nav collapsed, overrides vertical Nav
+.nav-collapsed-min {
+    .app-footer {
+        margin-left: 60px; // Collapsed Nav width
+    }
+}
+
+// When Nav is horizontal
+.app-nav-horizontal  {
+    > .app-footer {
+        margin-left: 0;
+    }
+}
