@@ -1,0 +1,27 @@
+{
+  "name": "flot.curvedlines",
+  "main": "curvedLines.js",
+  "authors": [
+    "Michael Zinsmaier"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/*",
+    "!curvedlines.js",
+    "!bower.json"
+  ],
+  "dependencies": {
+    "flot": ">=0.8.0"
+  },
+  "homepage": "https://github.com/MichaelZinsmaier/CurvedLines",
+  "version": "0.6.4",
+  "_release": "0.6.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.6.4",
+    "commit": "3fa41abe37a535b79cb77e7038b96e97dd1cba98"
+  },
+  "_source": "https://github.com/MichaelZinsmaier/CurvedLines.git",
+  "_target": "~0.6.4",
+  "_originalSource": "flot.curvedlines"
+}

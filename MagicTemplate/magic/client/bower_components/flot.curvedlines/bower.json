@@ -1,0 +1,16 @@
+{
+  "name": "flot.curvedlines",
+  "main": "curvedLines.js",
+  "authors": [
+    "Michael Zinsmaier"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/*",
+    "!curvedlines.js",
+    "!bower.json"
+  ],
+  "dependencies": {
+     "flot": ">=0.8.0"
+  }
+}
