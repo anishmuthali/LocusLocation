@@ -1,12 +1,16 @@
-package com.anish.basehacksandroid;
+package com.example.basehacks.locuslocation;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Service;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
@@ -16,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.google.firebase.database.DataSnapshot;
@@ -31,12 +36,11 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.service.RunningAverageRssiFilter;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class MainActivity extends Activity implements BeaconConsumer {
+public class MainActivity extends Service implements BeaconConsumer {
     protected static final String TAG = "RangingActivity";
     private BeaconManager beaconManager;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
@@ -48,118 +52,61 @@ public class MainActivity extends Activity implements BeaconConsumer {
     Beacon closestBeacon;
     long valueBeforeClose;
     boolean alreadyFar = false;
-    TextView dmvwaittime;
-    TextView carlsjrwaittime;
-    TextView theaterwaittime;
-    long dmvwait;
-    long carlsjrwait;
-    long theaterwait;
+    /** The service is starting, due to a call to startService() */
+    /** indicates how to behave if the service is killed */
+    int mStartMode;
 
+    /** interface for clients that bind */
+    IBinder mBinder;
 
+    /** indicates whether onRebind should be used */
+    boolean mAllowRebind;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        if (ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                        PERMISSION_REQUEST_COARSE_LOCATION);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
+        return START_STICKY;
+    }
+    public class LocalBinder extends Binder {
+        MainActivity getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return MainActivity.this;
         }
+    }
+
+    /** A client is binding to the service with bindService() */
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    /** Called when all clients have unbound with unbindService() */
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return mAllowRebind;
+    }
+
+    /** Called when a client is binding to the service with bindService()*/
+    @Override
+    public void onRebind(Intent intent) {
+
+    }
+    public void onCreate() {
+        //setContentView(R.layout.activity_main);
+
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser().
                 setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-        beaconManager.setForegroundScanPeriod(750l);
+        beaconManager.setForegroundScanPeriod(100l);
         beaconManager.setForegroundBetweenScanPeriod(0l);
         RunningAverageRssiFilter.setSampleExpirationMilliseconds(30000l);
         beaconManager.bind(this);
         mDatabase = FirebaseDatabase.getInstance();
         mRef = mDatabase.getReference("beacons");
-        dmvwaittime = (TextView) findViewById(R.id.dmvtime);
-        carlsjrwaittime = (TextView) findViewById(R.id.carlsjrtime);
-        theaterwaittime = (TextView) findViewById(R.id.theatertime);
-        ValueEventListener waitListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                dmvwait = (long) dataSnapshot.child("F4:5E:AB:27:4E:D2").getValue();
-                theaterwait = (long) dataSnapshot.child("F4:5E:AB:70:43:9F").getValue();
-                carlsjrwait = (long) dataSnapshot.child("F4:5E:AB:27:53:2C").getValue();
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                // ...
-            }
-        };
-        mDatabase.getReference("waittimes").addListenerForSingleValueEvent(waitListener);
-        ValueEventListener calcListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                long dmvcalc = dmvwait*((long) dataSnapshot.child("F4:5E:AB:27:4E:D2").getValue());
-                dmvwaittime.setText("Wait time: " + dmvcalc);
-                long theatercalc = theaterwait*((long) dataSnapshot.child("F4:5E:AB:70:43:9F").getValue());
-                theaterwaittime.setText("Wait time: " + theatercalc);
-                long carlsjrcalc = carlsjrwait*((long) dataSnapshot.child("F4:5E:AB:27:53:2C").getValue());
-                carlsjrwaittime.setText("Wait time: " + carlsjrcalc);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-            }
-        };
-        mRef.addValueEventListener(calcListener);
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_COARSE_LOCATION: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "coarse location permission granted");
-                } else {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
-                    builder.setPositiveButton(android.R.string.ok, null);
-                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                        }
-
-                    });
-                    builder.show();
-                }
-                return;
-            }
-        }
     }
 
-    @Override
-    protected void onStop(){
-        super.onStop();
+
+    public void onStop(){
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -178,7 +125,7 @@ public class MainActivity extends Activity implements BeaconConsumer {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         mRef.child(mBeaconAddr).setValue(valueBeforeClose);
         System.out.println("decremented " + valueBeforeClose);
 
@@ -209,7 +156,6 @@ public class MainActivity extends Activity implements BeaconConsumer {
                             for (int i = 0; i < beacons.size(); i++) {
 
                                 double d = ((Beacon) beaconArray[i]).getDistance();
-                                System.out.println("Distance: " + d);
                                 distances.add(d);
                                 if (d < 1) {
                                     closestBeacon = (Beacon) beaconArray[i];
@@ -220,7 +166,7 @@ public class MainActivity extends Activity implements BeaconConsumer {
 
 
                             if (idx != -1) {
-                                if(mFirst && closestBeacon.getDistance() < 0.5){
+                                if(mFirst && closestBeacon.getDistance() < 0.8){
                                     mBeaconAddr = closestBeacon.getBluetoothAddress();
                                     System.out.println("mFirst ran");
 
@@ -245,10 +191,8 @@ public class MainActivity extends Activity implements BeaconConsumer {
 
                                 }
                                 System.out.println("closest: " + closestBeacon.getBluetoothAddress() + "; mb: " + mBeaconAddr);
-                                //System.out.println("dist: " + closestBeacon.getDistance());
-                                if(closestBeacon.getDistance() > 0.5 && !alreadyFar && !mFirst){
-                                    mFirst = true;
-                                    alreadyFar = true;
+                                System.out.println("dist: " + closestBeacon.getDistance());
+                                if(closestBeacon.getDistance() > 0.8 && !alreadyFar){
                                     ValueEventListener listener = new ValueEventListener() {
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -256,7 +200,8 @@ public class MainActivity extends Activity implements BeaconConsumer {
                                             long oldAddrNum = (long) dataSnapshot.child(mBeaconAddr).getValue() - 1;
                                             mRef.child(mBeaconAddr).setValue(oldAddrNum);
                                             System.out.println("too far");
-
+                                            mFirst = true;
+                                            alreadyFar = true;
                                         }
 
                                         @Override
@@ -268,7 +213,7 @@ public class MainActivity extends Activity implements BeaconConsumer {
                                     };
                                     mRef.addListenerForSingleValueEvent(listener);
                                 }
-                                if(!closestBeacon.getBluetoothAddress().equals(mBeaconAddr) && !alreadyFar && !mFirst){
+                                if(!closestBeacon.getBluetoothAddress().equals(mBeaconAddr) && !alreadyFar){
                                     System.out.println("I ran");
                                     ValueEventListener listener = new ValueEventListener() {
                                         @Override
@@ -302,6 +247,7 @@ public class MainActivity extends Activity implements BeaconConsumer {
                     });
                 }
             }
+
         });
 
         try {
