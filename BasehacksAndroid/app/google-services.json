@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "843458724484",
+    "firebase_url": "https://beacon-5cac4.firebaseio.com",
+    "project_id": "beacon-5cac4",
+    "storage_bucket": "beacon-5cac4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:843458724484:android:34c7d7151a83066d",
+        "android_client_info": {
+          "package_name": "com.anish.basehacksandroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "843458724484-hq7g8oj304i0ffkhtdf0576rl7bi0u5s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOaSpWOZ3jgxILxm10hKgc3Ej4KJuYErM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
